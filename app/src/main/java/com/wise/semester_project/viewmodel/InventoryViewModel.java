@@ -4,9 +4,9 @@ import android.app.Application;
 import android.util.Log;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import com.wise.semester_project.InventoryApplication;
+
 import com.wise.semester_project.database.AppDatabase;
-import com.wise.semester_project.database.InventoryDao;
+import com.wise.semester_project.dao.InventoryDao;
 import com.wise.semester_project.model.InventoryItem;
 import java.util.ArrayList;
 import java.util.HashMap;

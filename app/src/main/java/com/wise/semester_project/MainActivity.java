@@ -3,11 +3,15 @@ package com.wise.semester_project;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.wise.semester_project.database.AppDatabase;
 import com.wise.semester_project.model.InventoryItem;
+import com.wise.semester_project.model.User;
 import com.wise.semester_project.ui.InventoryFragment;
 import com.wise.semester_project.ui.ScanFragment;
 import com.wise.semester_project.ui.MonitorFragment;
@@ -19,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private BottomNavigationView bottomNavigationView;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +32,19 @@ public class MainActivity extends AppCompatActivity {
         try {
             setContentView(R.layout.activity_main);
             Log.d(TAG, "setContentView completed");
+
+            // 获取当前用户信息
+            Intent intent = getIntent();
+            if (intent != null && intent.hasExtra("user")) {
+                currentUser = (User) intent.getSerializableExtra("user");
+                Log.d(TAG, "User info received: " + (currentUser != null ? currentUser.getUsername() : "null"));
+            } else {
+                Log.d(TAG, "No user info in intent");
+                // 如果没有用户信息，返回登录界面
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+                return;
+            }
 
             // 初始化数据库
             try {
@@ -86,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        setIntent(intent); // 更新当前Intent
         // 将NFC意图传递给当前活动的Fragment
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (currentFragment instanceof ScanFragment) {
@@ -146,5 +165,23 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d(TAG, "onDestroy called");
         executorService.shutdown();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.action_profile) {
+            // 跳转到个人资料页面
+            Intent intent = new Intent(this, ProfileActivity.class);
+            intent.putExtra("user", currentUser);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

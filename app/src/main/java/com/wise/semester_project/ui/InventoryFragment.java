@@ -17,8 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.wise.semester_project.R;
+import com.wise.semester_project.adapter.InventoryAdapter;
 import com.wise.semester_project.model.InventoryItem;
 import com.wise.semester_project.viewmodel.InventoryViewModel;
+import java.util.ArrayList;
 
 public class InventoryFragment extends Fragment {
     private static final String TAG = "InventoryFragment";
@@ -47,7 +49,7 @@ public class InventoryFragment extends Fragment {
         try {
             recyclerView = view.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            adapter = new InventoryAdapter();
+            adapter = new InventoryAdapter(new ArrayList<>());
             recyclerView.setAdapter(adapter);
             Log.d(TAG, "RecyclerView and Adapter initialized successfully");
 
@@ -60,7 +62,9 @@ public class InventoryFragment extends Fragment {
             // 观察数据变化
             viewModel.getAllItems().observe(getViewLifecycleOwner(), items -> {
                 Log.d(TAG, "Received " + (items != null ? items.size() : 0) + " items from database");
-                adapter.submitList(items);
+                if (items != null) {
+                    adapter.setItems(items);
+                }
             });
         } catch (Exception e) {
             Log.e(TAG, "Error in onCreateView", e);

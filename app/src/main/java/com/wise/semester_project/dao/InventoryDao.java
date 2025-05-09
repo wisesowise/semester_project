@@ -1,4 +1,4 @@
-package com.wise.semester_project.database;
+package com.wise.semester_project.dao;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
