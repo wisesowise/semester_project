@@ -39,13 +39,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switch_checkout_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="出库模式"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/switch_nfc_mode"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="模拟扫描"
         android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@id/switch_nfc_mode"
+        app:layout_constraintTop_toBottomOf="@id/switch_checkout_mode"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="32dp"/>

@@ -98,7 +98,22 @@ public class InventoryViewModel extends AndroidViewModel {
         Log.d(TAG, "Inserting item: " + item.getName());
         executorService.execute(() -> {
             try {
-                // 检查是否存在相同名称和位置的物品
+                // 先检查是否存在相同RFID标签的物品
+                InventoryItem existingByRfid = inventoryDao.getItemByRfidSync(item.getRfidTag());
+                if (existingByRfid != null) {
+                    // 如果存在相同RFID，直接更新数量
+                    existingByRfid.setQuantity(existingByRfid.getQuantity() + item.getQuantity());
+                    // 更新温度和湿度为最新值
+                    existingByRfid.setTemperature(item.getTemperature());
+                    existingByRfid.setHumidity(item.getHumidity());
+                    existingByRfid.setLastUpdated(System.currentTimeMillis());
+                    inventoryDao.update(existingByRfid);
+                    Log.d(TAG, "Updated existing item by RFID: " + existingByRfid.getName() + 
+                           ", new quantity: " + existingByRfid.getQuantity());
+                    return;
+                }
+                
+                // 再检查是否存在相同名称和位置的物品
                 InventoryItem existingItem = inventoryDao.findItemByNameAndLocation(item.getName(), item.getLocation());
                 if (existingItem != null) {
                     // 如果存在，合并数量
@@ -106,8 +121,9 @@ public class InventoryViewModel extends AndroidViewModel {
                     // 更新温度和湿度为最新值
                     existingItem.setTemperature(item.getTemperature());
                     existingItem.setHumidity(item.getHumidity());
+                    existingItem.setLastUpdated(System.currentTimeMillis());
                     inventoryDao.update(existingItem);
-                    Log.d(TAG, "Updated existing item: " + existingItem.getName() + 
+                    Log.d(TAG, "Updated existing item by name/location: " + existingItem.getName() + 
                           ", new quantity: " + existingItem.getQuantity());
                 } else {
                     // 如果不存在，插入新物品
@@ -128,6 +144,34 @@ public class InventoryViewModel extends AndroidViewModel {
                 Log.d(TAG, "Item updated successfully");
             } catch (Exception e) {
                 Log.e(TAG, "Error updating item", e);
+            }
+        });
+    }
+
+    /**
+     * 增加物品的数量，确保数据一致性
+     * @param item 要更新的物品
+     * @param increment 增加的数量
+     */
+    public void incrementQuantity(InventoryItem item, int increment) {
+        Log.d(TAG, "Incrementing quantity of " + item.getName() + " by " + increment);
+        executorService.execute(() -> {
+            try {
+                // 先获取最新的物品信息
+                InventoryItem latestItem = inventoryDao.getItemByIdSync(item.getId());
+                if (latestItem != null) {
+                    // 增加数量
+                    latestItem.setQuantity(latestItem.getQuantity() + increment);
+                    // 更新时间戳
+                    latestItem.setLastUpdated(System.currentTimeMillis());
+                    // 保存更新
+                    inventoryDao.update(latestItem);
+                    Log.d(TAG, "Item quantity updated successfully, new quantity: " + latestItem.getQuantity());
+                } else {
+                    Log.w(TAG, "Could not find item with id " + item.getId() + " for quantity update");
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating item quantity", e);
             }
         });
     }

@@ -49,7 +49,7 @@ public class InventoryFragment extends Fragment {
         try {
             recyclerView = view.findViewById(R.id.recycler_view);
             recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-            adapter = new InventoryAdapter(new ArrayList<>());
+            adapter = new InventoryAdapter(new ArrayList<>(), viewModel);
             recyclerView.setAdapter(adapter);
             Log.d(TAG, "RecyclerView and Adapter initialized successfully");
 

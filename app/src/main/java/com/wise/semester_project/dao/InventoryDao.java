@@ -29,8 +29,14 @@ public interface InventoryDao {
     @Query("SELECT * FROM inventory_items WHERE id = :id")
     LiveData<InventoryItem> getItemById(int id);
 
+    @Query("SELECT * FROM inventory_items WHERE id = :id")
+    InventoryItem getItemByIdSync(int id);
+
     @Query("SELECT * FROM inventory_items WHERE rfidTag = :rfidTag")
     LiveData<InventoryItem> getItemByRfid(String rfidTag);
+
+    @Query("SELECT * FROM inventory_items WHERE rfidTag = :rfidTag")
+    InventoryItem getItemByRfidSync(String rfidTag);
 
     @Query("SELECT * FROM inventory_items WHERE quantity < :threshold")
     LiveData<List<InventoryItem>> getLowStockItems(int threshold);
@@ -40,4 +46,13 @@ public interface InventoryDao {
 
     @Query("SELECT * FROM inventory_items WHERE name = :name AND location = :location LIMIT 1")
     InventoryItem findItemByNameAndLocation(String name, String location);
+
+    @Query("SELECT * FROM inventory_items WHERE location LIKE :locationPrefix")
+    LiveData<List<InventoryItem>> getItemsByLocationPrefix(String locationPrefix);
+
+    @Query("SELECT * FROM inventory_items WHERE location LIKE :locationPrefix")
+    List<InventoryItem> getItemsByLocationPrefixSync(String locationPrefix);
+
+    @Query("UPDATE inventory_items SET temperature = :temperature, humidity = :humidity, lastUpdated = :timestamp WHERE location LIKE :locationPrefix")
+    void updateEnvironmentDataByLocation(String locationPrefix, double temperature, double humidity, long timestamp);
 } 

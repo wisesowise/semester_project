@@ -16,6 +16,7 @@ import com.wise.semester_project.ui.InventoryFragment;
 import com.wise.semester_project.ui.ScanFragment;
 import com.wise.semester_project.ui.MonitorFragment;
 import com.wise.semester_project.ui.ProfileFragment;
+import com.wise.semester_project.service.SensorService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -56,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e(TAG, "Error initializing database", e);
             }
+            
+            // 启动传感器服务
+            startSensorService();
 
             bottomNavigationView = findViewById(R.id.bottom_navigation);
             if (bottomNavigationView == null) {
@@ -77,6 +81,11 @@ public class MainActivity extends AppCompatActivity {
                     selectedFragment = new MonitorFragment();
                 } else if (itemId == R.id.nav_profile) {
                     selectedFragment = new ProfileFragment();
+                } else if (itemId == R.id.nav_chat) {
+                    // 启动ChatActivity
+                    Intent chatIntent = new Intent(MainActivity.this, ChatActivity.class);
+                    startActivity(chatIntent);
+                    return true;
                 }
 
                 if (selectedFragment != null) {
@@ -134,6 +143,19 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "Error inserting test data", e);
             }
         });
+    }
+
+    /**
+     * 启动传感器服务
+     */
+    private void startSensorService() {
+        try {
+            Intent sensorServiceIntent = new Intent(this, SensorService.class);
+            startService(sensorServiceIntent);
+            Log.d(TAG, "Sensor service started");
+        } catch (Exception e) {
+            Log.e(TAG, "Error starting sensor service", e);
+        }
     }
 
     @Override
